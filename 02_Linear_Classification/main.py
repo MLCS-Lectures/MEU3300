@@ -4,17 +4,6 @@ import numpy as np
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-class_list = [ '0',
-               '1',
-               '2',
-               '3',
-               '4',
-               '5',
-               '6',
-               '7',
-               '8',
-               '9']
-
 ''' Model parameters '''
 # It determines how quickly or how slowly you want to update the parameters.
 # if the learning rate is too large, loss function will not converge.
@@ -43,10 +32,8 @@ bias = tf.Variable(tf.random_normal([10], stddev=0.01), name='bias')
 
 
 ''' Model layer setup '''
-
 logits = tf.add(tf.matmul(images, weight), bias)
 output = tf.argmax(logits, axis=1)
-
 
 
 ''' Loss & optimizer, accuracy '''
