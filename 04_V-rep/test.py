@@ -44,7 +44,7 @@ if clientID!=-1:
     # Now step a few times:
     for i in range(1,100):
         t=vrep.simxGetLastCmdTime(clientID)
-        print t
+        print (t)
 
         vrep.simxSynchronousTrigger(clientID);
 
