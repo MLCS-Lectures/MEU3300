@@ -1,4 +1,3 @@
-
 # This small example illustrates how to use the remote API
 # synchronous mode. The synchronous mode needs to be
 # pre-enabled on the server side. You would do this by
