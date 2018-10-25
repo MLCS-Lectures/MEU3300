@@ -1,12 +1,15 @@
 from __future__ import print_function, absolute_import, division
 import time
 import sys
+import math
 from api import vrep
 
 
 class PID:
 
     def __init__(self, dt, Kp=0, Ki=0, Kd=0):
+
+        self.dt = dt
         self.Kp = Kp
         self.Ki = Ki
         self.Kd = Kd
@@ -46,21 +49,33 @@ if __name__=='__main__':
 
         # get joint handles:
         joint_handle = [
-            vrep.simxGetObjectHandle(clientID, 'MTB_axis1', opmode_blocking),
-            vrep.simxGetObjectHandle(clientID, 'MTB_axis2', opmode_blocking),
-            vrep.simxGetObjectHandle(clientID, 'MTB_axis3', opmode_blocking)
+            vrep.simxGetObjectHandle(clientID, 'MTB_axis1', opmode_blocking)[1],
+            vrep.simxGetObjectHandle(clientID, 'MTB_axis2', opmode_blocking)[1]
         ]
-        print(vrep.simxGetObjectPosition(clientID, joint_handle[0],joint_handle[1],opmode_blocking))
-        print(vrep.simxGetObjectPosition(clientID, joint_handle[1],joint_handle[2],opmode_blocking))
 
+        # get target handle
+        cube_handle = vrep.simxGetObjectHandle(clientID, 'Cube', opmode_blocking)[1]
+
+        # link length
+        a1 = 0.467
+        a2 = 0.4
 
         # start the simulation:
         vrep.simxStartSimulation(clientID,vrep.simx_opmode_blocking)
-        vrep.simxSynchronousTrigger(clientID);
+        vrep.simxSynchronousTrigger(clientID)
+
+        # desired pose
+        [x_d, y_d, _] = vrep.simxGetObjectPosition(clientID, cube_handle, -1, opmode_blocking)[1]
+
+        # desired joint angle
+        j2_d = math.acos(x_d-
+
+        j1_d = 
+        j2_d = x
 
         # Now step a few times:
         for i in range(1,100):
-            vrep.simxSynchronousTrigger(clientID);
+            vrep.simxSynchronousTrigger(clientID)
 
         # stop the simulation:
         vrep.simxStopSimulation(clientID,vrep.simx_opmode_blocking)
