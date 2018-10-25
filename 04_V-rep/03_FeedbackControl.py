@@ -80,8 +80,8 @@ if __name__=='__main__':
             j1_d = math.atan2(y_d, x_d)-math.atan2(a2*math.sin(j2_d), a1+a2*cos_j2_d)
         
         # import PID controller object
-        pid_j1 = PID(dt=0.05, Kp=3.0, Ki=0.0, Kd=0.5)
-        pid_j2 = PID(dt=0.05, Kp=1.5, Ki=0.001, Kd=0.0)
+        pid_j1 = PID(dt=0.05, Kp=0.2, Ki=0.0, Kd=0.0)
+        pid_j2 = PID(dt=0.05, Kp=0.1, Ki=0.0, Kd=0.0)
 
         # Now step a few times:
         for t in range(1,200):
