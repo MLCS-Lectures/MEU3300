@@ -23,8 +23,8 @@ if __name__=='__main__':
 
         # get joint handles:
         joint_handle = [
-            vrep.simxGetObjectHandle(clientID, 'motor_left', opmode_blocking)[1],
-            vrep.simxGetObjectHandle(clientID, 'motor_right', opmode_blocking)[1]
+            vrep.simxGetObjectHandle(clientID, 'Motor_left', opmode_blocking)[1],
+            vrep.simxGetObjectHandle(clientID, 'Motor_right', opmode_blocking)[1]
         ]
 
         # get target handle
@@ -38,11 +38,8 @@ if __name__=='__main__':
         for t in range(1,500):
             vrep.simxSynchronousTrigger(clientID)
             
-            _, lrf_bin = vrep.simxGetStringSignal(clientID, 'measuredDataAtThisTime', opmode_blocking)
-            print(lrf_bin)
+            _, lrf_bin = vrep.simxGetStringSignal(clientID, 'LiDAR', opmode_blocking)
             lrf = np.array(vrep.simxUnpackFloats(lrf_bin), dtype=float)
-            print(lrf)
-
 
             # control input 
             if np.min(lrf) >0.1:
