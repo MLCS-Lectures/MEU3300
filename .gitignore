@@ -1,3 +1,5 @@
 .vscode
 __pychache__
 *.pyc
+
+05_DDPG/model/*.ckpt
