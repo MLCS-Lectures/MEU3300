@@ -5,8 +5,10 @@ import math
 import numpy as np
 from api import vrep
 
-L = 2.2
-w = 1.44
+# Vehicle geometry
+L = 2.2      # distance between front and rear wheel
+w = 1.44     # distance between left and right wheel
+d = 0.63407  # wheel diameter
 
 if __name__=='__main__':
     try:
@@ -32,32 +34,39 @@ if __name__=='__main__':
             vrep.simxGetObjectHandle(clientID, 'motorRight', opmode_blocking)[1]
         ]
 
-        # get target handle
-        robot_handle = vrep.simxGetObjectHandle(clientID, 'Robot', opmode_blocking)[1]
-
         # start the simulation:
         vrep.simxStartSimulation(clientID,vrep.simx_opmode_blocking)
         vrep.simxSynchronousTrigger(clientID)
 
         # Now step a few times:
-        for t in range(1,500):
+        for t in range(1,300):
             vrep.simxSynchronousTrigger(clientID)
             
-            _, lrf_bin = vrep.simxGetStringSignal(clientID, 'LiDAR', opmode_blocking)
-            lrf = np.array(vrep.simxUnpackFloats(lrf_bin), dtype=float)
-
             # control input 
-            v = 1
-            theta = 0.1
-            # apply control input to the actuators
-            R = L/theta
-            deltaLeft = np.atan2(L,R+w/2)
-            deltaRight = np.atan2(L,R-w/2)
+            vel = 10                    # m/s. there's no maximum velocity, but maximum torque is 200 Nm
+            delta_ack = np.deg2rad(40)  # rad/s. maximum is 0.698131 (40 degree)
+            if t > 150:
+                delta_ack *= -1
+
+
+            # Ackermann steering
+            R = L/np.abs(delta_ack)
+            delta_o = np.arctan2(L,R+w/2)
+            delta_i = np.arctan2(L,R-w/2)
+            if delta_ack > 0:
+                deltaLeft = delta_i
+                deltaRight = delta_o
+            elif delta_ack < 0:
+                deltaLeft = -delta_o
+                deltaRight = -delta_i
+            else:
+                deltaLeft = 0
+                deltaRight = 0
+
             vrep.simxSetJointTargetPosition(clientID, joint_handle[0], deltaLeft, opmode_blocking)
             vrep.simxSetJointTargetPosition(clientID, joint_handle[1], deltaRight, opmode_blocking)
-
-            vrep.simxSetJointTargetVelocity(clientID, joint_handle[2], v, opmode_blocking)
-            vrep.simxSetJointTargetVelocity(clientID, joint_handle[3], v, opmode_blocking)
+            vrep.simxSetJointTargetVelocity(clientID, joint_handle[2], 2*vel/d, opmode_blocking)
+            vrep.simxSetJointTargetVelocity(clientID, joint_handle[3], 2*vel/d, opmode_blocking)
 
         # stop the simulation:
         vrep.simxStopSimulation(clientID,vrep.simx_opmode_blocking)
