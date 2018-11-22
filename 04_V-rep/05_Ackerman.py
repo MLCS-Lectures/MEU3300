@@ -5,6 +5,9 @@ import math
 import numpy as np
 from api import vrep
 
+L = 2.2
+w = 1.44
+
 if __name__=='__main__':
     try:
         vrep.simxFinish(-1) # just in case, close all opened connections
@@ -23,7 +26,8 @@ if __name__=='__main__':
 
         # get joint handles:
         joint_handle = [
-            
+            vrep.simxGetObjectHandle(clientID, 'steeringLeft', opmode_blocking)[1],
+            vrep.simxGetObjectHandle(clientID, 'steeringRight', opmode_blocking)[1],
             vrep.simxGetObjectHandle(clientID, 'motorLeft', opmode_blocking)[1],
             vrep.simxGetObjectHandle(clientID, 'motorRight', opmode_blocking)[1]
         ]
@@ -43,15 +47,17 @@ if __name__=='__main__':
             lrf = np.array(vrep.simxUnpackFloats(lrf_bin), dtype=float)
 
             # control input 
-            if np.min(lrf) >0.1:
-                u1 = 1
-                u2 = 1
-            else:
-                u1 = 0
-                u2 = 0
+            v = 1
+            theta = 0.1
             # apply control input to the actuators
-            vrep.simxSetJointTargetVelocity(clientID, joint_handle[0], u1, opmode_blocking)
-            vrep.simxSetJointTargetVelocity(clientID, joint_handle[1], u2, opmode_blocking)
+            R = L/theta
+            deltaLeft = np.atan2(L,R+w/2)
+            deltaRight = np.atan2(L,R-w/2)
+            vrep.simxSetJointTargetPosition(clientID, joint_handle[0], deltaLeft, opmode_blocking)
+            vrep.simxSetJointTargetPosition(clientID, joint_handle[1], deltaRight, opmode_blocking)
+
+            vrep.simxSetJointTargetVelocity(clientID, joint_handle[2], v, opmode_blocking)
+            vrep.simxSetJointTargetVelocity(clientID, joint_handle[3], v, opmode_blocking)
 
         # stop the simulation:
         vrep.simxStopSimulation(clientID,vrep.simx_opmode_blocking)
